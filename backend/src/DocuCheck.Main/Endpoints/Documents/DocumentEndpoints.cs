@@ -1,13 +1,12 @@
 using System.Globalization;
-using System.Text.Json;
 using DocuCheck.Application.Common;
 using DocuCheck.Application.Services.Interfaces;
 using DocuCheck.Domain.Entities.ChecksHistory;
 using DocuCheck.Domain.Entities.ChecksHistory.Enums;
+using DocuCheck.Main.Contracts.CheckDocument;
 using DocuCheck.Main.Contracts.GetDocumentCheckHistory;
-using Microsoft.AspNetCore.Http.HttpResults;
+using DocuCheck.Main.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using DocumentCheckResultDto = DocuCheck.Main.Contracts.CheckDocument.DocumentCheckResultDto;
 
 namespace DocuCheck.Main.Endpoints.Documents
 {
@@ -16,43 +15,22 @@ namespace DocuCheck.Main.Endpoints.Documents
         public static void MapDocumentEndpoints(this IEndpointRouteBuilder routeBuilder)
         {
             routeBuilder.MapGet("api/documents/check/{documentNumber}",
-                async
-                    ([FromRoute] string documentNumber, 
+                async ([FromRoute] string documentNumber, 
                         HttpContext ctx, 
-                        IDocumentService documentService, 
-                        CancellationToken cancellationToken = default) =>
+                        IDocumentService documentService) =>
                 {
-                    ctx.Response.ContentType = "text/event-stream";
-                    ctx.Response.Headers.CacheControl = "no-cache";
-
+                    SetSseResponseHeaders(ctx);
                     var total = Enum.GetValues<DocumentType>().Length;
-                    var sseInit = new SseFrame(
-                        Id: Guid.NewGuid().ToString(),
-                        Event: "total",
-                        Data: new { Total = total }
-                    );
-                    await ctx.Response.WriteAsync(sseInit.ToString(), cancellationToken: cancellationToken);
-                    await ctx.Response.Body.FlushAsync(cancellationToken);
+                    await ctx.WriteSseFrameAsync("total", new { Total = total });
                     
-                    await foreach (var result in documentService.CheckDocumentAsync(documentNumber).WithCancellation(cancellationToken))
+                    await foreach (var result in documentService.CheckDocumentAsync(documentNumber).WithCancellation(ctx.RequestAborted))
                     {
                         var dto = MapCheckResultDocumentCheckResultDto(result);
-                        var sseFrame = new SseFrame(
-                            Id: Guid.NewGuid().ToString(),
-                            Event: "checkResult",
-                            Data: dto
-                        ).ToString();
-                        await ctx.Response.WriteAsync(sseFrame.ToString(), cancellationToken: cancellationToken);
-                        await ctx.Response.Body.FlushAsync(cancellationToken);
+                        await ctx.WriteSseFrameAsync("checkResult", dto);
                     }
 
-                    var sseDone = new SseFrame(
-                        Id: Guid.NewGuid().ToString(),
-                        Event: "done",
-                        Data: new { Message = "Document check completed" }
-                    );
-                    await ctx.Response.WriteAsync(sseDone.ToString(), cancellationToken: cancellationToken);
-                    await ctx.Response.Body.FlushAsync(cancellationToken);
+                    var sseDone = new { Message = "Document check completed" }.ToSseFrame("done");
+                    await ctx.WriteSseFrameAsync("done", sseDone);
                 });
             
             routeBuilder.MapGet("api/documents/history",            
@@ -65,14 +43,12 @@ namespace DocuCheck.Main.Endpoints.Documents
                 });
         }
 
-        private record SseFrame(string Id, string Event, object Data)
+        private static void SetSseResponseHeaders(HttpContext ctx)
         {
-            public override string ToString()
-            {
-                return $"id: {Id}\nevent: {Event}\ndata: {JsonSerializer.Serialize(Data)}\n\n";
-            }
-        };
-        
+            ctx.Response.ContentType = "text/event-stream";
+            ctx.Response.Headers.CacheControl = "no-cache";
+        }
+
         private static GetDocumentCheckHistoryDto MapCheckHistoryGetDocumentCheckHistoryDto(PagedResult<CheckHistory> pagedHistory)
         {
             var response = new GetDocumentCheckHistoryDto(

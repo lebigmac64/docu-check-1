@@ -1,5 +1,4 @@
 using System.Net;
-using DocuCheck.Main.Endpoints;
 using DocuCheck.Main.Endpoints.Documents;
 using Microsoft.AspNetCore.Diagnostics;
 

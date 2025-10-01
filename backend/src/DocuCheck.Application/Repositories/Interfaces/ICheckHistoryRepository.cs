@@ -1,6 +1,5 @@
 using DocuCheck.Application.Common;
 using DocuCheck.Domain.Entities.ChecksHistory;
-using DocuCheck.Domain.Entities.ChecksHistory.Enums;
 
 namespace DocuCheck.Application.Repositories.Interfaces;
 
