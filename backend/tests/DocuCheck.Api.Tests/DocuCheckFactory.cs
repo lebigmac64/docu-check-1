@@ -2,6 +2,7 @@ using DocuCheck.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -14,7 +15,16 @@ namespace DocuCheck.Api.Tests
             builder.UseEnvironment("Testing");
 
             builder.ConfigureTestServices(services =>
-            { });
+            {
+                services.RemoveAll(typeof(DocuCheckDbContext));
+                services.AddDbContext<DocuCheckDbContext>(options =>
+                {
+                    options.UseSqlite("Data Source=:memory");
+                });
+                var dbContext = services.BuildServiceProvider().GetRequiredService<DocuCheckDbContext>();
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+            });
             
             base.ConfigureWebHost(builder);
         }

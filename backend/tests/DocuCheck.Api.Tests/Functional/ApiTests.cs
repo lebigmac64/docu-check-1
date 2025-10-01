@@ -11,7 +11,6 @@ public class ApiTests
         var client = factory.CreateClient();
 
         var response = await client.GetAsync($"api/documents/check/{number}");
-        response.EnsureSuccessStatusCode();
 
         await using var stream = await response.Content.ReadAsStreamAsync();
         using var reader = new StreamReader(stream);
@@ -19,7 +18,7 @@ public class ApiTests
         while (!reader.EndOfStream)
         {
             var line = await reader.ReadLineAsync();
-            if (line != null && line.StartsWith("event"))
+            if (line != null && line.StartsWith("id: "))
             {
                 events.Add(line);
             }

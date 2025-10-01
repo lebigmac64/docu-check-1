@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocuCheck.Infrastructure.Migrations
 {
     [DbContext(typeof(DocuCheckDbContext))]
-    [Migration("20250929205520_InitialMigration")]
+    [Migration("20251001093457_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

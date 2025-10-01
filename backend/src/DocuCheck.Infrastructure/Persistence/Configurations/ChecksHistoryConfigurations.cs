@@ -21,5 +21,7 @@ public class ChecksHistoryConfigurations : IEntityTypeConfiguration<CheckHistory
             
         entity.Property(e => e.CheckedAt)
             .IsRequired();
+
+        entity.Property(e => e.ResultType);
     }
 }
