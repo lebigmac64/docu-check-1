@@ -8,7 +8,7 @@ using DocuCheck.Domain.Entities.ChecksHistory.ValueObjects;
 namespace DocuCheck.Application.Services;
 
 internal class DocumentService(
-    IMinistryOfInteriorService ministryOfInteriorService, 
+    IMinistryOfInteriorClient ministryOfInteriorClient, 
     ICheckHistoryRepository checkHistoryRepository) 
     : IDocumentService
 {
@@ -22,7 +22,7 @@ internal class DocumentService(
         {
             foreach (var documentType in Enum.GetValues<DocumentType>())
             {
-                var checkResult = await ministryOfInteriorService.CheckDocumentValidityAsync(docNumber, documentType);
+                var checkResult = await ministryOfInteriorClient.CheckValidityAsync(docNumber, documentType);
                 results.Add(checkResult);
                 yield return checkResult;
             }

@@ -1,15 +1,19 @@
 using DocuCheck.Application.Services.Interfaces;
 using DocuCheck.Domain.Entities.ChecksHistory.Enums;
+using DocuCheck.Domain.Entities.ChecksHistory.ValueObjects;
 using DocuCheck.Infrastructure.Clients.Responses;
 using DocuCheck.Infrastructure.Helpers;
 
 namespace DocuCheck.Infrastructure.Clients.MinistryOfInterior;
 
-internal class MinistryOfInteriorClient(HttpClient client, IEnvironmentProvider environmentProvider) 
+internal class MinistryOfInteriorClient(
+    HttpClient client, 
+    IEnvironmentProvider environmentProvider) 
+    : IMinistryOfInteriorClient
 {
-    public async Task<CheckResult> CheckValidityAsync(string documentNumber, DocumentType documentType, string environment = "")
+    public async Task<CheckResult> CheckValidityAsync(DocumentNumber documentNumber, DocumentType documentType)
     {
-        var requestUri = $"neplatne-doklady/doklady.aspx?dotaz={documentNumber}&doklad={(byte)documentType}";
+        var requestUri = $"neplatne-doklady/doklady.aspx?dotaz={documentNumber.Value}&doklad={(byte)documentType}";
         using var response = await client.GetAsync(requestUri);
 
         if (environmentProvider.EnvironmentName != "Testing")

@@ -3,7 +3,7 @@ using DocuCheck.Domain.Entities.ChecksHistory.ValueObjects;
 
 namespace DocuCheck.Application.Services.Interfaces;
 
-public interface IMinistryOfInteriorService
+public interface IMinistryOfInteriorClient
 {
-    Task<CheckResult> CheckDocumentValidityAsync(DocumentNumber docNumber, DocumentType documentType);
+    Task<CheckResult> CheckValidityAsync(DocumentNumber documentNumber, DocumentType documentType);
 }
