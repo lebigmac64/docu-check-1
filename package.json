@@ -1,0 +1,12 @@
+{
+  "name": "docucheck-fullstack",
+  "scripts": {
+    "dev": "concurrently \"npm run api\" \"npm run web\"",
+    "build": "bash ./build.sh",
+    "api": "cd backend && dotnet run --project ./src/DocuCheck.Main/DocuCheck.Main.csproj --launch-profile https_dev",
+    "web": "cd frontend/docucheck-web && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
