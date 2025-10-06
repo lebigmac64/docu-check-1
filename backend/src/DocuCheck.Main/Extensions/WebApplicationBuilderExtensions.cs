@@ -1,5 +1,6 @@
 using DocuCheck.Application;
-using DocuCheck.Application.Services.Interfaces;
+using DocuCheck.Application.Providers;
+using DocuCheck.Domain;
 using DocuCheck.Infrastructure;
 using DocuCheck.Main.Providers;
 
@@ -15,6 +16,7 @@ namespace DocuCheck.Main.Extensions
                 return new HostEnvironmentProvider(env.EnvironmentName);
             });
             builder.Services.AddApplication();
+            builder.Services.AddDomain();
             builder.Services.AddInfrastructure(builder.Configuration);
             
             builder.Services.ConfigureCors();

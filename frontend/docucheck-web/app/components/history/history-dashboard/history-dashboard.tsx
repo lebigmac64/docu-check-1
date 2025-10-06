@@ -18,13 +18,13 @@ type Response = {
 
 export default function HistoryDashboard() : ReactElement {
     const [response, setResponse] = useState<Response>({totalCount: 0, pageSize: 10, currentPage: 1, items: []});
-    const [request, setRequest] = useState<Request>({pageNumber: 1, pageSize: 10});
+    const [paginationState, setPaginationState] = useState<Request>({pageNumber: 1, pageSize: 10});
 
     useEffect(() => {
         const abortController = new AbortController();
         async function fetchRecords() {
             try {
-                const uri = new URL(`${API_ROOT}api/documents/history?pageNumber=${request.pageNumber}&pageSize=${request.pageSize}`);
+                const uri = new URL(`${API_ROOT}api/documents/history?pageNumber=${paginationState.pageNumber}&pageSize=${paginationState.pageSize}`);
                 const response = await fetch(uri, {signal: abortController.signal});
 
                 if (!response.ok) {
@@ -42,15 +42,14 @@ export default function HistoryDashboard() : ReactElement {
         return () => {
             abortController.abort();
         }
-    }, [request]);
+    }, [paginationState]);
 
     function handleRequestChanged(newPage: number) {
-        setRequest((old) => ({...old, pageNumber: newPage}));
+        setPaginationState((old) => ({...old, pageNumber: newPage}));
     }
-  return (
-    <>
-      <DesktopTable records={response.items} currentPage={request.pageNumber} onPageChange={handleRequestChanged} totalPages={Math.ceil(response.totalCount / request.pageSize)} />
-      <MobileTable records={response.items}  currentPage={request.pageNumber} onPageChange={handleRequestChanged} totalPages={Math.ceil(response.totalCount / request.pageSize)} />
+  return (<>
+      <DesktopTable records={response.items} currentPage={paginationState.pageNumber} onPageChange={handleRequestChanged} totalPages={Math.ceil(response.totalCount / paginationState.pageSize)} />
+      <MobileTable records={response.items}  currentPage={paginationState.pageNumber} onPageChange={handleRequestChanged} totalPages={Math.ceil(response.totalCount / paginationState.pageSize)} />
     </>
   );
 }

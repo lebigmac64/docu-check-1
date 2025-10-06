@@ -1,4 +1,4 @@
-using DocuCheck.Application.Services.Interfaces;
+using DocuCheck.Application.Providers;
 
 namespace DocuCheck.Main.Providers;
 

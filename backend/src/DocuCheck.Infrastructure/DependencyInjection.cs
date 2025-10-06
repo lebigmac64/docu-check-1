@@ -1,9 +1,11 @@
+using DocuCheck.Application.Providers;
 using DocuCheck.Application.Repositories.Interfaces;
-using DocuCheck.Application.Services.Interfaces;
-using DocuCheck.Infrastructure.Clients.MinistryOfInterior;
+using DocuCheck.Application.Services;
+using DocuCheck.Infrastructure.Clients;
 using DocuCheck.Infrastructure.Extensions;
 using DocuCheck.Infrastructure.Persistence;
 using DocuCheck.Infrastructure.Persistence.Repositories;
+using DocuCheck.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ public static class DependencyInjection
 {
     public static void AddInfrastructure(this IServiceCollection services, IConfigurationManager configuration)
     {
+        services.AddScoped<IMinistryOfInteriorService, MinistryOfInteriorService>();
         services.AddPersistence(configuration);
         services.AddRepositories();
         services.ConfigureHttpClients(configuration);
@@ -27,7 +30,7 @@ public static class DependencyInjection
     
     private static void ConfigureHttpClients(this IServiceCollection services, IConfigurationManager configuration)
     {
-        services.AddHttpClient<IMinistryOfInteriorClient, MinistryOfInteriorClient>(client =>
+        services.AddHttpClient<MinistryOfInteriorClient>(client =>
         {
             client.BaseAddress = new Uri(configuration.GetMinistryApiBaseAddress());
         });

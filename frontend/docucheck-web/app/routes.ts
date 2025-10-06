@@ -6,4 +6,4 @@ import {
 
 export default [
     index("routes/home.tsx"),
-    route("history", "routes/history.tsx")] satisfies RouteConfig[];
+    route("history", "routes/history.tsx")] satisfies RouteConfig;

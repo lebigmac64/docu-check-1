@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 namespace DocuCheck.Infrastructure.Helpers;
@@ -14,5 +15,6 @@ public static class XmlHelper
         var serializer = new XmlSerializer(typeof(T));
         using var reader = new StringReader(value);
         return serializer.Deserialize(reader) is T result ? result : default;
+        
     }
 }

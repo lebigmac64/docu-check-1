@@ -1,7 +1,7 @@
 import DocumentInput from "~/components/index/document-input/document-input";
 import React, {useState} from "react";
-import type {FullResult} from "~/components/index/document-form/document-form.module";
 import ResultNode from "~/components/index/result-node/result-node";
+import type {FullResult} from "~/models/full-result";
 
 export default function DocumentForm(): React.ReactElement {
     const [results, setResults] = useState([] as FullResult[]);
@@ -23,7 +23,7 @@ export default function DocumentForm(): React.ReactElement {
               </span>
                       </div>
                       <h5 className="text-sm mb-3">Č. {result.DocumentNumber}</h5>
-                      <ResultNode checkResults={result.CheckResults} />
+                      <ResultNode result={result} />
                   </li>
               ))}
           </ul>

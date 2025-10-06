@@ -1,6 +1,6 @@
 using System.Globalization;
 using DocuCheck.Application.Common;
-using DocuCheck.Application.Services.Interfaces;
+using DocuCheck.Application.Handlers.Interfaces;
 using DocuCheck.Domain.Entities.ChecksHistory;
 using DocuCheck.Domain.Entities.ChecksHistory.Enums;
 using DocuCheck.Main.Contracts.CheckDocument;
@@ -17,13 +17,13 @@ namespace DocuCheck.Main.Endpoints.Documents
             routeBuilder.MapGet("api/documents/check/{documentNumber}",
                 async ([FromRoute] string documentNumber, 
                         HttpContext ctx, 
-                        IDocumentService documentService) =>
+                        IDocumentHandler documentHandler) =>
                 {
                     SetSseResponseHeaders(ctx);
                     var total = Enum.GetValues<DocumentType>().Length;
                     await ctx.WriteSseFrameAsync("total", new { Total = total });
                     
-                    await foreach (var result in documentService.CheckDocumentAsync(documentNumber).WithCancellation(ctx.RequestAborted))
+                    await foreach (var result in documentHandler.CheckDocumentAsync(documentNumber).WithCancellation(ctx.RequestAborted))
                     {
                         var dto = MapCheckResultDocumentCheckResultDto(result);
                         await ctx.WriteSseFrameAsync("checkResult", dto);
@@ -34,9 +34,9 @@ namespace DocuCheck.Main.Endpoints.Documents
                 });
             
             routeBuilder.MapGet("api/documents/history",            
-                async (IDocumentService documentService, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10) =>
+                async (IDocumentHandler documentHandler, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10) =>
                 {
-                    var history = await documentService.GetDocumentCheckHistoryAsync(pageNumber, pageSize);
+                    var history = await documentHandler.GetDocumentCheckHistoryAsync(pageNumber, pageSize);
                     var dto = MapCheckHistoryGetDocumentCheckHistoryDto(history);
                     
                     return Results.Ok(dto);

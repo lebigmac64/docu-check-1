@@ -1,7 +1,7 @@
 import {useCallback, useState} from "react";
-import type {CheckResult} from "~/components/index/document-form/document-form.module";
+import type {CheckResult} from "~/models/check-result";
 
-type DocumentCheckState = {
+export type DocumentCheckState = {
     docNumber: string;
     isSubmitting: boolean;
     currentResults: CheckResult[];

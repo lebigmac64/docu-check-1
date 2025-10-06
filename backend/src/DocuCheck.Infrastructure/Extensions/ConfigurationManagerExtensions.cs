@@ -6,7 +6,7 @@ public static class ConfigurationManagerExtensions
 {
     public static string GetMinistryApiBaseAddress(this IConfigurationManager configuration)
     {
-        var baseAddress = configuration["HttpClients:MinistryApi:BaseAddress"];
+        var baseAddress = configuration["HttpClients:MinistryOfInterior:BaseAddress"];
         if (string.IsNullOrWhiteSpace(baseAddress))
         {
             throw new ArgumentNullException(nameof(baseAddress), "MinistryApi BaseAddress is not configured.");

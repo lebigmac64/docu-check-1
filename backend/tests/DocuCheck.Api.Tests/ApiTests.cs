@@ -1,4 +1,4 @@
-﻿namespace DocuCheck.Api.Tests.Functional;
+﻿namespace DocuCheck.Api.Tests;
 
 public class ApiTests
 {

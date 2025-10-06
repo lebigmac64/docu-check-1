@@ -1,24 +1,21 @@
 import ProgressBar from "~/components/index/progress-bar/progress-bar";
-import {
-    type CheckResult,
-    type FullResult,
-    getInvalidDocTypes,
-    ResultType
-} from "~/components/index/document-form/document-form.module";
 import React, {useEffect, useRef} from "react";
 import {API_ROOT} from "~/config";
 import useDocumentCheck from "~/components/hooks/use-document-check";
+import InfoCard from "~/components/index/info-card/info-card";
+import type {FullResult} from "~/models/full-result";
+import type {CheckResult} from "~/models/check-result";
+import {calculateResult} from "~/components/index/helpers/helpers";
 
 export default function DocumentInput({onResultsChanged}: {
     onResultsChanged: React.Dispatch<React.SetStateAction<FullResult[]>>;
 }): React.ReactElement {
     const [docState, startCheck, resetCheck, setCurrentResults, setTotal, setDocNumber] = useDocumentCheck();
-    const esRef = useRef<EventSource | null>(null);
-    const currentResultsRef = useRef<CheckResult[]>([]);
-
+    const currentResultsRef = useRef<CheckResult[]>(docState.currentResults);
     useEffect(() => {
         currentResultsRef.current = docState.currentResults;
     }, [docState.currentResults]);
+    const esRef = useRef<EventSource | null>(null);
 
     useEffect(() => {
         if (!docState.isSubmitting) return;
@@ -41,20 +38,20 @@ export default function DocumentInput({onResultsChanged}: {
         });
 
         es.addEventListener("checkResult", (e: MessageEvent) => {
+            console.log("Received checkResult:", e.data);
             const parsed = JSON.parse(e.data) as CheckResult;
-            setCurrentResults((last) => [parsed, ...last]);
+            setCurrentResults((last) => {
+                const updated = [parsed, ...last];
+                currentResultsRef.current = updated;
+                return updated;
+            });
         });
 
         es.addEventListener("done", (e: MessageEvent) => {
-            const fullResult = {
-                DocumentNumber: docState.docNumber,
-                CheckResults: currentResultsRef.current,
-                CheckedAt: new Date().toISOString(),
-            } as FullResult;
-
-            es.close();
+            const fullResult = calculateResult(docState, currentResultsRef.current);
             onResultsChanged((last) => [fullResult, ...last]);
             resetCheck();
+            es.close();
         });
 
         return () => {
@@ -111,18 +108,7 @@ export default function DocumentInput({onResultsChanged}: {
             >
                 {docState.isSubmitting ? "Zrušit" : "Ověřit"}
             </button>
-            {docState.currentResults.some(
-                (cr) => cr.ResultType === ResultType.Invalid,
-            ) && (
-                <div className="flex items-center gap-3 bg-red-900/30 border-l-4 border-red-400 p-3 rounded shadow transition-all duration-300">
-                    <p>
-                        Nalezen evidovaný dokument typu:
-                    </p>
-                    <p>
-                        {getInvalidDocTypes(docState.currentResults)}
-                    </p>
-                </div>
-            )}
+            <InfoCard results={docState.currentResults} />
         </form>
     </div>
 }

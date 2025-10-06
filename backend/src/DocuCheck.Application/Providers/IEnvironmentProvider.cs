@@ -1,4 +1,4 @@
-namespace DocuCheck.Application.Services.Interfaces;
+namespace DocuCheck.Application.Providers;
 
 public interface IEnvironmentProvider
 {

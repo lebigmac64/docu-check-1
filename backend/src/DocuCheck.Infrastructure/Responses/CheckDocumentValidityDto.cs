@@ -1,7 +1,7 @@
 using System.Xml.Serialization;
 using DocuCheck.Domain.Entities.ChecksHistory.Enums;
 
-namespace DocuCheck.Infrastructure.Clients.Responses;
+namespace DocuCheck.Infrastructure.Responses;
 
 [XmlRoot("doklady_neplatne")]
 public class CheckDocumentValidityDto
@@ -20,6 +20,8 @@ public class CheckDocumentValidityDto
     
     [XmlElement("odpoved")] 
     public AnswerNode? Answer { get; set; }
+    
+    public bool IsValidResponse => Error is null && Answer is not null;
     
     public CheckResult ParseCheckResult(DocumentType type)
     {

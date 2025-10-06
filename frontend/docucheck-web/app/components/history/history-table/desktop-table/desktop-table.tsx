@@ -1,5 +1,5 @@
 import type { HistoryRecord } from "~/components/history/history-table/models/history-record";
-import StatusChip from "~/components/history/status-chip/status-chip";
+import {StatusChip} from "~/components/history/status-chip/status-chip";
 import React from "react";
 import PaginationBar from "~/components/pagination/pagination-bar";
 

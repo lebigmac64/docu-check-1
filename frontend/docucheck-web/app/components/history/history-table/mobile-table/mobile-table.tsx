@@ -1,5 +1,4 @@
-import StatusChip from "~/components/history/status-chip/status-chip";
-import { getDocumentType } from "~/components/index/document-form/document-form.module";
+import {StatusChip} from "~/components/history/status-chip/status-chip";
 import React from "react";
 import type { HistoryRecord } from "~/components/history/history-table/models/history-record";
 import PaginationBar from "~/components/pagination/pagination-bar";

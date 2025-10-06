@@ -22,6 +22,7 @@ namespace DocuCheck.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocuCheckDbContext).Assembly);
+            
             base.OnModelCreating(modelBuilder);
         }
     }
